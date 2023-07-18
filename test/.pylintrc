@@ -54,7 +54,8 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-disable=C0330,too-many-lines,too-many-public-methods,too-many-locals,too-many-arguments,too-many-instance-attributes,unnecessary-pass
+# Removed C033 as removed in 2.5.1
+disable=too-many-lines,too-many-public-methods,too-many-locals,too-many-arguments,too-many-instance-attributes,unnecessary-pass
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -224,12 +225,13 @@ max-line-length=100
 # Maximum number of lines in a module
 max-module-lines=2000
 
+# Removed in pylint 2.6.0
 # List of optional constructs for which whitespace checking is disabled. `dict-
 # separator` is used to allow tabulation in dicts, etc.: {1  : 1,\n222: 2}.
 # `trailing-comma` allows a space between comma and closing bracket: (a, ).
 # `empty-line` allows space-only lines.
-no-space-check=trailing-comma,
-               dict-separator
+# no-space-check=trailing-comma,
+#               dict-separator
 
 # Allow the body of a class to be on the same line as the declaration if body
 # contains single statement.
@@ -463,4 +465,5 @@ known-third-party=enchant
 
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception"
-overgeneral-exceptions=Exception
+# Overgeneral exceptions without module name deprecated and to be removed in 3.0
+# overgeneral-exceptions=Exception
