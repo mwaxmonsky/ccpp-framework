@@ -1207,8 +1207,12 @@ class Scheme(SuiteObject):
                         emsg = '\nLoop variables not allowed in {} phase.'
                         errmsg += emsg.format(self.phase())
                     # end if
-                    raise CCPPError(errmsg.format(self.subroutine_name,
-                                                  vstdname))
+                    errmsg.format(self.subroutine_name, vstdname)
+                    metadata_processing_logger = logging.getLogger("metadata_processing_logger")
+                    if metadata_processing_logger.hasHandlers():
+                        metadata_processing_logger.error(errmsg)
+                    else:
+                        raise CCPPError(errmsg)
                 # end if
             # end if
             # Are there any forward/reverse transforms for this variable?

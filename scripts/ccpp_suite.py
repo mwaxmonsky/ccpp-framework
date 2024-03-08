@@ -7,6 +7,8 @@ to implement calls to a set of suites for a given host model."""
 # Python library imports
 import os.path
 import logging
+import logging.handlers
+import queue
 import xml.etree.ElementTree as ET
 # CCPP framework imports
 from ccpp_state_machine import CCPP_STATE_MACH, RUN_PHASE_NAME
@@ -630,6 +632,12 @@ class API(VarDictionary):
                 raise CCPPError(errmsg.format(header.title))
             # end if
         # end for
+        message_queue = queue.Queue(-1)
+        queue_handler = logging.handlers.QueueHandler(message_queue)
+        stream_handler = logging.StreamHandler()
+        queue_listener = logging.handlers.QueueListener(message_queue, stream_handler)
+        metadata_processing_logger = logging.getLogger("metadata_processing_logger")
+        metadata_processing_logger.addHandler(queue_handler)
         # Turn the SDF files into Suites
         for sdf in sdfs:
             suite = Suite(sdf, self, run_env)
@@ -637,6 +645,10 @@ class API(VarDictionary):
                           self.__ddt_lib, run_env)
             self.__suites.append(suite)
         # end for
+        if message_queue.qsize() > 0:
+            queue_listener.start()
+            queue_listener.stop()
+            raise CCPPError("Found errors while analysing metadata files.  Unable to proceed.")
         # We will need the correct names for errmsg and errcode
         evar = self.host_model.find_variable(standard_name='ccpp_error_message')
         subst_dict = {'intent':'out'}

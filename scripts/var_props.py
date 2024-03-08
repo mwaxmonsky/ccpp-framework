@@ -9,6 +9,7 @@ VarCompatObj
 
 # Python library imports
 import keyword
+import logging
 import re
 # CCPP framework imports
 from conversion_tools import unit_conversion
@@ -1161,22 +1162,28 @@ class VarCompatObj:
         u1_str = self.units_to_string(var1_units, self.__v1_context)
         u2_str = self.units_to_string(var2_units, self.__v2_context)
         unit_conv_str = "{0}__to__{1}".format(u1_str, u2_str)
+        forward_transform = None
+        reverse_transform = None
         try:
             forward_transform = getattr(unit_conversion, unit_conv_str)()
         except AttributeError:
-            emsg = "Unsupported unit conversion, '{}' to '{}' for '{}'"
-            raise ParseSyntaxError(emsg.format(var1_units, var2_units,
-                                               self.__stdname,
-                                               context=self.__v2_context))
+            emsg = emsg = f"Unsupported unit conversion, '{var1_units}' to '{var2_units}' for '{self.__stdname}'"
+            metadata_processing_logger = logging.getLogger("metadata_processing_logger")
+            if metadata_processing_logger.hasHandlers():
+                metadata_processing_logger.error(emsg)
+            else:
+                raise ParseSyntaxError(emsg)
         # end if
         unit_conv_str = "{0}__to__{1}".format(u2_str, u1_str)
         try:
             reverse_transform = getattr(unit_conversion, unit_conv_str)()
         except AttributeError:
-            emsg = "Unsupported unit conversion, '{}' to '{}' for '{}'"
-            raise ParseSyntaxError(emsg.format(var2_units, var1_units,
-                                               self.__stdname,
-                                               context=self.__v1_context))
+            emsg = f"Unsupported unit conversion, '{var2_units}' to '{var1_units}' for '{self.__stdname}'"
+            metadata_processing_logger = logging.getLogger("metadata_processing_logger")
+            if metadata_processing_logger.hasHandlers():
+                metadata_processing_logger.error(emsg)
+            else:
+                raise ParseSyntaxError(emsg)
         # end if
         return (forward_transform, reverse_transform)
 
@@ -1335,15 +1342,22 @@ class VarCompatObj:
         # end if
         # Test that the resulting string is a valid Python identifier
         if not string.isidentifier():
-            emsg = "Unsupported units entry for {}, '{}'{}"
             ctx = context_string(context)
-            raise ParseSyntaxError(emsg.format(self.__stdname, units ,ctx))
+            emsg = f"Unsupported units entry for {self.__stdname}, '{units}'{ctx}"
+            metadata_processing_logger = logging.getLogger("metadata_processing_logger")
+            if metadata_processing_logger.hasHandlers():
+                metadata_processing_logger.error(emsg)
+            else:
+                raise ParseSyntaxError(emsg)
         # end if
         # Test that the resulting string is NOT a Python keyword
         if keyword.iskeyword(string):
-            emsg = "Invalid units entry, '{}', Python identifier"
-            raise ParseSyntaxError(emsg.format(units),
-                                   context=context)
+            emsg = "Invalid units entry, '{units}', Python identifier"
+            metadata_processing_logger = logging.getLogger("metadata_processing_logger")
+            if metadata_processing_logger.hasHandlers():
+                metadata_processing_logger.error(emsg)
+            else:
+                raise ParseSyntaxError(emsg, context=context)
         # end if
         return string
 
