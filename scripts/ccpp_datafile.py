@@ -159,7 +159,8 @@ def _command_line_parser():
     the list of optional arguments below.
     Note that exactly one action is required.
     """
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser(description=description,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("datatable", type=str,
                         help="Path to a data table XML file created by capgen")
     ### Only one action per call
@@ -184,26 +185,25 @@ def _command_line_parser():
     # end for
     ###
     defval = ","
-    help_str = "String to separate items in a list (default: '{}')"
+    help_str = "String to separate items in a list"
     parser.add_argument("--separator", type=str, required=False, default=defval,
-                        metavar="SEP", dest="sep", help=help_str.format(defval))
+                        metavar="SEP", dest="sep", help=help_str)
     defval = False
     help_str = ("Exclude protected variables (only has an effect if the "
-                "requested report is returning a list of variables)."
-                " (default: {})")
+                "requested report is returning a list of variables).")
     parser.add_argument("--exclude-protected", action='store_true',
                         required=False,
-                        default=defval, help=help_str.format(defval))
+                        default=defval, help=help_str)
     defval = -1
     help_str = ("Screen width for '--show' line wrapping. -1 means do not "
-                "wrap. (default: {})")
+                "wrap.")
     parser.add_argument("--line-wrap", type=int, required=False,
                         metavar="LINE_WIDTH", dest="line_wrap",
-                        default=defval, help=help_str.format(defval))
+                        default=defval, help=help_str)
     defval = 2
-    help_str = "Indent depth for '--show' output (default: {})"
+    help_str = "Indent depth for '--show' output"
     parser.add_argument("--indent", type=int, required=False, default=2,
-                        help=help_str.format(defval))
+                        help=help_str)
     return parser
 
 ###############################################################################
